@@ -9,7 +9,7 @@ module act_quant_wrapper #(
     input rstn,
     input [DATA_WIDTH*MAX_INPUT_WIDTH-1:0] din,
     input [1:0] fmap_precision,
-    input [2:0] shift,
+    input [3:0] shift,
     input vld_i,
     input [4:0] layer_num,
     output [8*MAX_INPUT_WIDTH-1:0] data_o,

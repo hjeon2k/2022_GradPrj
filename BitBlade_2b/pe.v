@@ -1,3 +1,5 @@
+`include "../source/parameters.v"
+
 module pe	( CLK, Input_Feature, Weight, i_SignI, i_SignW, Output_PSUM );
 input	CLK;
 input	[`BITS_ACT-1:0]	Input_Feature;

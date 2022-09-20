@@ -1,4 +1,5 @@
-module	MUL_reconfigurable_2_2 ( A, B, SignI, SignW, MUL );
+
+/*module	MUL_reconfigurable_2_2 ( A, B, SignI, SignW, MUL );
 input	A, B;
 input 	SignI, 	SignW;
 output	[3:0]	MUL;
@@ -15,12 +16,14 @@ assign 	PP[3] 	= ~ ( A_Ext[0]	& B_Ext[1] );
 assign 	PP[4] 	= A_Ext[1]	& B_Ext[1];
 assign 	PP[5] 	= 1'b1;
 
+
 wire	n0, n1, n2, n3;
 assign 	MUL[0] 	= PP[0];
 ADDH_X1M_A9TR 	HA_0 	( .A(PP[1]),	.B(PP[3]),	.S(MUL[1]),	.CO(n0) );
 ADDF_X1M_A9TR 	FA_0 	( .A(PP[4]), 	.B(PP[2]), 	.CI(n0),	.S(MUL[2]),	.CO(n1) );
 ADDH_X1M_A9TR	HA_1	( .A(PP[5]), 	.B(n1),	.S(MUL[3]),	.CO(n2) );
 endmodule
+*/
 
 module	DFFQ #(parameter WIDTH=32)( CLK, D, Q );
 input	CLK;
@@ -43,7 +46,7 @@ always @(posedge CLK) begin
 end
 
 endmodule
-
+/*
 module	BUF_PSUM_RST #(parameter WIDTH=32)( CLK, RST, D, Q );
 input	CLK;
 input	RST;
@@ -56,6 +59,7 @@ always @(posedge CLK, posedge RST) begin
 end
 
 endmodule
+
 
 module prng #(parameter WIDTH=32)(
 		input CLK, RST, 
@@ -102,3 +106,4 @@ module prng2 #(parameter WIDTH=32)(
 			Y <= S;
 	end
 endmodule	
+*/

@@ -1,6 +1,6 @@
 `include "../source/parameters.v"
 
-module pe_array_64 ( CLK, RST, i_Act, i_Weight, i_Precision, i_Bias, i_Sel_Bias, i_Flush, o_Done, o_Psum );
+module pe_array_64 ( CLK, RST, i_Act, i_Weight, i_Precision, i_Bias, i_Sel_Bias, i_Flush, core_vld, o_Done, o_Psum );
 input	CLK, RST;
 input	[`BITS_ACT*`PE_ROW-1:0]	i_Act;
 input	[`BITS_WEIGHT*`PE_ROW-1:0]	i_Weight;
@@ -8,7 +8,9 @@ input	[3:0]	i_Precision;
 input	signed	[`N_BIAS-1:0]	i_Bias;
 input	i_Sel_Bias;
 input	i_Flush;
+input   core_vld;
 output	signed	[`BITS_PSUM-1:0]	o_Psum;
+output reg o_Done;
 
 wire	[`BITS_ACT*`PE_ROW-1:0]	Act_BUF, Act_MUX, Act_TR;
 wire	[`BITS_WEIGHT*`PE_ROW-1:0]	Weight_BUF, Weight_MUX, Weight_TR;
@@ -22,15 +24,16 @@ wire	i_Sel_Bias_BUF;
 DFFQ	#(1)	DFFQ_SEL_BIAS_BUF	( .CLK(CLK),	.D(i_Sel_Bias),	.Q(i_Sel_Bias_BUF) );
 wire	i_Flush_BUF;
 DFFQ	#(1)	DFFQ_FLUSH_BUF	( .CLK(CLK),	.D(i_Flush),	.Q(i_Flush_BUF) );
+wire	core_vld_BUF;
+DFFQ	#(1)	DFFQ_VLD_BUF	( .CLK(CLK),	.D(core_vld),	.Q(core_vld_BUF) );
+
 genvar i;
 generate
-for (i=0;i<`PE_ROW;i=i+1) begin: pe_forloop
-	DFFQ	#(`BITS_ACT)	DFFQ_ACT_BUF	( .CLK(CLK), .D(i_Act[`BITS_ACT*i +: `BITS_ACT]), .Q(Act_BUF[`BITS_ACT*i +: `BITS_ACT]) );
-	DFFQ	#(`BITS_WEIGHT)	DFFQ_WEIGHT_BUF	( .CLK(CLK), .D(i_Weight[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .Q(Weight_BUF[`BITS_WEIGHT*i +: `BITS_WEIGHT]) );
+for (i=0;i<`N_DOT;i=i+1) begin: pe_forloop
+	DFFQ	#(32)	DFFQ_ACT_BUF	( .CLK(CLK), .D(i_Act[32*i +: 32]), .Q(Act_BUF[32*i +: 32]) );
+	DFFQ	#(32)	DFFQ_WEIGHT_BUF	( .CLK(CLK), .D(i_Weight[32*i +: 32]), .Q(Weight_BUF[32*i +: 32]) );
 
-	mux_fusion_2b	mux_fusion_2b	( .Precision(i_Precision), .I(Act_BUF[`BITS_ACT*i +: `BITS_ACT]), .W(Weight_BUF[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .I_MUX(Act_MUX[`BITS_ACT*i +: `BITS_ACT]), .W_MUX(Weight_MUX[`BITS_WEIGHT*i +: `BITS_WEIGHT]) );
-
-	pe	PE_MODULE	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_SignI(SignI[i]), .i_SignW(SignW[i]), .Output_PSUM(PSUM[i]) ); 
+	mux_fusion_2b	mux_fusion_2b	( .Precision(i_Precision), .I(i_Act[32*i +: 32]), .W(i_Weight[32*i +: 32]), .I_MUX(Act_MUX[32*i +: 32]), .W_MUX(Weight_MUX[32*i +: 32]) );
 end
 endgenerate
 
@@ -38,9 +41,10 @@ genvar j;
 generate
 for (i=0;i<`PE_ROW;i=i+1) begin: transpose_forloop
 	for (j=0;j<`N_DOT;j=j+1) begin: transpose_dot_forloop
-		assign	Act_TR[`BITS_PARALLEL*(i*`N_ACT+j) +: `BITS_PARALLEL]	= Act_MUX[`BITS_PARALLEL*(j*`N_ACT+i) +: `BITS_PARALLEL];
-		assign	Weight_TR[`BITS_PARALLEL*(i*`N_WEIGHT+j) +: `BITS_PARALLEL]	= Weight_MUX[`BITS_PARALLEL*(j*`N_WEIGHT+i) +: `BITS_PARALLEL];
+		assign	Act_TR[`BITS_PARALLEL*(i*`N_DOT+j) +: `BITS_PARALLEL]	= Act_MUX[`BITS_PARALLEL*(j*16+i) +: `BITS_PARALLEL];
+		assign	Weight_TR[`BITS_PARALLEL*(i*`N_DOT+j) +: `BITS_PARALLEL]	= Weight_MUX[`BITS_PARALLEL*(j*16+i) +: `BITS_PARALLEL];
 	end
+	pe	PE_MODULE	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_SignI(SignI[i]), .i_SignW(SignW[i]), .Output_PSUM(PSUM[i]) ); 
 end
 endgenerate
 
@@ -49,11 +53,11 @@ assign PSUM_SHIFT_MERGE = PSUM_SHIFT[0] + PSUM_SHIFT[1] + PSUM_SHIFT[2] + PSUM_S
 
 wire	signed	[`BITS_PSUM-1:0]	PSUM_D, PSUM_Q;
 //assign	PSUM_D	= ( i_Sel_Bias_BUF ? Bias_BUF : PSUM_Q ) + PSUM_SHIFT_MERGE;
-accumulator	ACCU_PSUM	( .i_Sel_Bias_BUF(i_Sel_Bias_BUF), .Bias_BUF(Bias_BUF), .PSUM_Q(PSUM_Q), .PSUM_SHIFT_MERGE(PSUM_SHIFT_MERGE), .PSUM_D(PSUM_D) );
-DFFQF	#(`BITS_PSUM)	DFFQ_PSUM	( .CLK(CLK), .F(i_Flush_BUF), .D(PSUM_D), .Q(PSUM_Q) );
+accumulator	ACCU_PSUM	( .i_Sel_Bias_BUF(i_Sel_Bias_BUF), .Bias_BUF(Bias_BUF), .PSUM_Q(PSUM_Q), .i_Flush(i_Flush_BUF), .PSUM_SHIFT_MERGE(PSUM_SHIFT_MERGE), .core_vld(core_vld_BUF), .PSUM_D(PSUM_D) );
+DFFQ	#(`BITS_PSUM)	DFFQ_PSUM	( .CLK(CLK), .D(PSUM_D), .Q(PSUM_Q) );
 assign	o_Psum	= PSUM_Q;
 
-assign o_Done = i_Sel_Bias_BUF;
+always @(posedge CLK) o_Done <= i_Sel_Bias_BUF;
 
 // PE Sign Configuration
 always @(*) begin

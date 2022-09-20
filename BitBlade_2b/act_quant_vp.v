@@ -15,7 +15,7 @@ input clk,
 input rstn,
 input [DATA_WIDTH-1:0] din,
 input [1:0] fmap_precision, // 0: 2-bit, 1: 4-bit, 2: 8-bit
-input [2:0] shift,
+input [3:0] shift,
 input vld_i,
 input linear,
 output reg [7:0] data_o,
@@ -24,8 +24,8 @@ output reg vld_o
 
 integer MAX_VAL_8 = 127;
 integer MIN_VAL_8 = -127;
-integer MAX_VAL_4 = 15;
-integer MIN_VAL_4 = -15;
+integer MAX_VAL_4 = 7;
+integer MIN_VAL_4 = -7;
 integer MAX_VAL_2 = 1;
 integer MIN_VAL_2 = -1;
 
