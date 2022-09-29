@@ -30,10 +30,10 @@ DFFQ	#(1)	DFFQ_VLD_BUF	( .CLK(CLK),	.D(core_vld),	.Q(core_vld_BUF) );
 genvar i;
 generate
 for (i=0;i<`N_DOT;i=i+1) begin: pe_forloop
-	DFFQ	#(32)	DFFQ_ACT_BUF	( .CLK(CLK), .D(i_Act[32*i +: 32]), .Q(Act_BUF[32*i +: 32]) );
-	DFFQ	#(32)	DFFQ_WEIGHT_BUF	( .CLK(CLK), .D(i_Weight[32*i +: 32]), .Q(Weight_BUF[32*i +: 32]) );
+	DFFQ	#(MUX_FUS)	DFFQ_ACT_BUF	( .CLK(CLK), .D(i_Act[MUX_FUS*i +: MUX_FUS]), .Q(Act_BUF[MUX_FUS*i +: MUX_FUS]) );
+	DFFQ	#(MUX)FUS)	DFFQ_WEIGHT_BUF	( .CLK(CLK), .D(i_Weight[MUX_FUS*i +: MUX_FUS]), .Q(Weight_BUF[MUX_FUS*i +: MUX_FUS]) );
 
-	mux_fusion_2b	mux_fusion_2b	( .Precision(i_Precision), .I(i_Act[32*i +: 32]), .W(i_Weight[32*i +: 32]), .I_MUX(Act_MUX[32*i +: 32]), .W_MUX(Weight_MUX[32*i +: 32]) );
+	mux_fusion_2b	mux_fusion_2b	( .Precision(i_Precision), .I(i_Act[MUX_FUS*i +: MUX_FUS]), .W(i_Weight[MUX_FUS*i +: MUX_FUS]), .I_MUX(Act_MUX[MUX_FUS*i +: MUX_FUS]), .W_MUX(Weight_MUX[MUX_FUS*i +: MUX_FUS]) );
 end
 endgenerate
 

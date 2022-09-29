@@ -1,4 +1,4 @@
-module MUL_2_2(I, W, SignI, SignW, MUL);
+module MUL_custom_2_2 (I, W, SignI, SignW, MUL);
   input I, W;
   input SignI, Sign@;
   output [1:0] MUL;
