@@ -30,10 +30,10 @@ DFFQ	#(1)	DFFQ_VLD_BUF	( .CLK(CLK),	.D(core_vld),	.Q(core_vld_BUF) );
 genvar i;
 generate
 for (i=0;i<`N_DOT;i=i+1) begin: pe_forloop
-	DFFQ	#(MUX_FUS)	DFFQ_ACT_BUF	( .CLK(CLK), .D(i_Act[MUX_FUS*i +: MUX_FUS]), .Q(Act_BUF[MUX_FUS*i +: MUX_FUS]) );
-	DFFQ	#(MUX)FUS)	DFFQ_WEIGHT_BUF	( .CLK(CLK), .D(i_Weight[MUX_FUS*i +: MUX_FUS]), .Q(Weight_BUF[MUX_FUS*i +: MUX_FUS]) );
+	DFFQ	#(`MUX_FUS)	DFFQ_ACT_BUF	( .CLK(CLK), .D(i_Act[`MUX_FUS*i +: `MUX_FUS]), .Q(Act_BUF[`MUX_FUS*i +: `MUX_FUS]) );
+	DFFQ	#(`MUX_FUS)	DFFQ_WEIGHT_BUF	( .CLK(CLK), .D(i_Weight[`MUX_FUS*i +: `MUX_FUS]), .Q(Weight_BUF[`MUX_FUS*i +: `MUX_FUS]) );
 
-	mux_fusion_2b	mux_fusion_2b	( .Precision(i_Precision), .I(i_Act[MUX_FUS*i +: MUX_FUS]), .W(i_Weight[MUX_FUS*i +: MUX_FUS]), .I_MUX(Act_MUX[MUX_FUS*i +: MUX_FUS]), .W_MUX(Weight_MUX[MUX_FUS*i +: MUX_FUS]) );
+	mux_fusion_1b	MUX_FUSION  ( .Precision(i_Precision), .I(i_Act[`MUX_FUS*i +: `MUX_FUS]), .W(i_Weight[`MUX_FUS*i +: `MUX_FUS]), .I_MUX(Act_MUX[`MUX_FUS*i +: `MUX_FUS]), .W_MUX(Weight_MUX[`MUX_FUS*i +: `MUX_FUS]) );
 end
 endgenerate
 
@@ -63,42 +63,42 @@ always @(posedge CLK) o_Done <= i_Sel_Bias_BUF;
 always @(*) begin
 	case (i_Precision)
 		default: begin
-			SignI <= 16'b1111_1111_1111_1111;
-			SignW <= 16'b1111_1111_1111_1111;
+			SignI <= 16'd0;
+			SignW <= 16'd0;
 		end
-		4'b00_00: begin // 2b 2b
-			SignI <= 16'b1111_1111_1111_1111;
-			SignW <= 16'b1111_1111_1111_1111;
+		4'b00_00: begin // 1b 1b
+			SignI <= 16'd0;
+			SignW <= 16'd0;
 		end
-		4'b01_00: begin // 4b 2b
-			SignI <= 16'b1111_0000_1111_0000;
-			SignW <= 16'b1111_1111_1111_1111;
+		4'b01_00: begin // 2b 1b
+			SignI <= 16'b1010_1010_1010_1010;
+			SignW <= 16'd0;
 		end
-		4'b00_01: begin // 2b 4b
-			SignI <= 16'b1111_1111_1111_1111;
+		4'b00_01: begin // 1b 2b
+			SignI <= 16'd0;
 			SignW <= 16'b1010_1010_1010_1010;
 		end
-		4'b10_00: begin // 8b 2b
-			SignI <= 16'b1111_0000_0000_0000;
-			SignW <= 16'b1111_1111_1111_1111;
+		4'b10_00: begin // 4b 1b
+			SignI <= 16'b1000_1000_1000_1000;
+			SignW <= 16'd0;
 		end
-		4'b00_10: begin // 2b 8b
-			SignI <= 16'b1111_1111_1111_1111;
+		4'b00_10: begin // 1b 4b
+			SignI <= 16'd0;
 			SignW <= 16'b1000_1000_1000_1000;
 		end
-		4'b01_01: begin // 4b 4b
-			SignI <= 16'b1111_0000_1111_0000;
+		4'b01_01: begin // 2b 2b
+			SignI <= 16'b1100_1100_1100_1100;
 			SignW <= 16'b1010_1010_1010_1010;
 		end
-		4'b10_01: begin // 8b 4b
-			SignI <= 16'b1111_0000_0000_0000;
-			SignW <= 16'b1010_1010_1010_1010;
+		4'b10_01: begin // 4b 2b
+			SignI <= 16'b1000_1000_1000_1000;
+			SignW <= 16'b1111_0000_1111_0000;
 		end
-		4'b01_10: begin // 4b 8b
+		4'b01_10: begin // 2b 4b
 			SignI <= 16'b1111_0000_1111_0000;
 			SignW <= 16'b1000_1000_1000_1000;
 		end
-		4'b10_10: begin // 8b 8b 
+		4'b10_10: begin // 4b 4b 
 			SignI <= 16'b1111_0000_0000_0000;
 			SignW <= 16'b1000_1000_1000_1000;
 		end
@@ -108,7 +108,7 @@ end
 // PSUM Shift
 always @(*) begin
 	case (i_Precision)
-		4'b00_00: begin
+	  default: begin
 			PSUM_SHIFT[0]	<= PSUM[0];
 			PSUM_SHIFT[1]	<= PSUM[1];
 			PSUM_SHIFT[2]	<= PSUM[2];
@@ -126,167 +126,95 @@ always @(*) begin
 			PSUM_SHIFT[14]	<= PSUM[14];
 			PSUM_SHIFT[15]	<= PSUM[15];
 		end
-		4'b01_00: begin
+	4'b00_00: begin
 			PSUM_SHIFT[0]	<= PSUM[0];
 			PSUM_SHIFT[1]	<= PSUM[1];
 			PSUM_SHIFT[2]	<= PSUM[2];
 			PSUM_SHIFT[3]	<= PSUM[3];
-			PSUM_SHIFT[4]	<= PSUM[4]	<< 2;
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 2;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 2;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 2;
+			PSUM_SHIFT[4]	<= PSUM[4];
+			PSUM_SHIFT[5]	<= PSUM[5];
+			PSUM_SHIFT[6]	<= PSUM[6];
+			PSUM_SHIFT[7]	<= PSUM[7];
 			PSUM_SHIFT[8]	<= PSUM[8];
 			PSUM_SHIFT[9]	<= PSUM[9];
 			PSUM_SHIFT[10]	<= PSUM[10];
 			PSUM_SHIFT[11]	<= PSUM[11];
-			PSUM_SHIFT[12]	<= PSUM[12]	<< 2;
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 2;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 2;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 2;
-		end
-		4'b00_01: begin
-			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1]	<< 2;
-			PSUM_SHIFT[2]	<= PSUM[2];
-			PSUM_SHIFT[3]	<= PSUM[3]	<< 2;
-			PSUM_SHIFT[4]	<= PSUM[4];
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 2;
-			PSUM_SHIFT[6]	<= PSUM[6];
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 2;
-			PSUM_SHIFT[8]	<= PSUM[8];
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 2;
-			PSUM_SHIFT[10]	<= PSUM[10];
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 2;
 			PSUM_SHIFT[12]	<= PSUM[12];
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 2;
+			PSUM_SHIFT[13]	<= PSUM[13];
 			PSUM_SHIFT[14]	<= PSUM[14];
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 2;
+			PSUM_SHIFT[15]	<= PSUM[15];
 		end
-		4'b10_00: begin
+		4'b01_00, 4'b00_01: begin
 			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1];
+			PSUM_SHIFT[1]	<= PSUM[1] << 1;
 			PSUM_SHIFT[2]	<= PSUM[2];
-			PSUM_SHIFT[3]	<= PSUM[3];
-			PSUM_SHIFT[4]	<= PSUM[4]	<< 2;
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 2;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 2;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 2;
-			PSUM_SHIFT[8]	<= PSUM[8]	<< 4;
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 4;
-			PSUM_SHIFT[10]	<= PSUM[10]	<< 4;
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 4;
-			PSUM_SHIFT[12]	<= PSUM[12]	<< 6;
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 6;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 6;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 6;
-		end
-		4'b00_10: begin
-			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1]	<< 2;
-			PSUM_SHIFT[2]	<= PSUM[2]	<< 4;
-			PSUM_SHIFT[3]	<= PSUM[3]	<< 6;
+			PSUM_SHIFT[3]	<= PSUM[3] << 1;
 			PSUM_SHIFT[4]	<= PSUM[4];
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 2;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 4;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 6;
+			PSUM_SHIFT[5]	<= PSUM[5] << 1;
+			PSUM_SHIFT[6]	<= PSUM[6];
+			PSUM_SHIFT[7]	<= PSUM[7] << 1;
 			PSUM_SHIFT[8]	<= PSUM[8];
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 2;
-			PSUM_SHIFT[10]	<= PSUM[10]	<< 4;
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 6;
-			PSUM_SHIFT[12]	<= PSUM[12];
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 2;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 4;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 6;
-		end
-		4'b01_01: begin
-			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1]	<< 2;
-			PSUM_SHIFT[2]	<= PSUM[2];
-			PSUM_SHIFT[3]	<= PSUM[3]	<< 2;
-			PSUM_SHIFT[4]	<= PSUM[4]	<< 2;
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 4;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 2;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 4;
-			PSUM_SHIFT[8]	<= PSUM[8];
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 2;
+			PSUM_SHIFT[9]	<= PSUM[9] << 1;
 			PSUM_SHIFT[10]	<= PSUM[10];
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 2;
-			PSUM_SHIFT[12]	<= PSUM[12]	<< 2;
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 4;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 2;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 4;
+			PSUM_SHIFT[11]	<= PSUM[11] << 1;
+			PSUM_SHIFT[12]	<= PSUM[12];
+			PSUM_SHIFT[13]	<= PSUM[13]	<< 1;
+			PSUM_SHIFT[14]	<= PSUM[14];
+			PSUM_SHIFT[15]	<= PSUM[15]	<< 1;
 		end
-		4'b10_01: begin
+		4'b10_00, 4'b00_10, 4'b01_01: begin
 			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1]	<< 2;
-			PSUM_SHIFT[2]	<= PSUM[2];
-			PSUM_SHIFT[3]	<= PSUM[3]	<< 2;
-			PSUM_SHIFT[4]	<= PSUM[4]	<< 2;
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 4;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 2;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 4;
-			PSUM_SHIFT[8]	<= PSUM[8]	<< 4;
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 6;
-			PSUM_SHIFT[10]	<= PSUM[10]	<< 4;
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 6;
-			PSUM_SHIFT[12]	<= PSUM[12]	<< 6;
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 8;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 6;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 8;
-		end
-		4'b01_10: begin
-			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1]	<< 2;
-			PSUM_SHIFT[2]	<= PSUM[2]	<< 4;
-			PSUM_SHIFT[3]	<= PSUM[3]	<< 6;
-			PSUM_SHIFT[4]	<= PSUM[4]	<< 2;
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 4;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 6;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 8;
+			PSUM_SHIFT[1]	<= PSUM[1] << 1;
+			PSUM_SHIFT[2]	<= PSUM[2] << 2;
+			PSUM_SHIFT[3]	<= PSUM[3] << 3;
+			PSUM_SHIFT[4]	<= PSUM[4];
+			PSUM_SHIFT[5]	<= PSUM[5] << 1;
+			PSUM_SHIFT[6]	<= PSUM[6] << 2;
+			PSUM_SHIFT[7]	<= PSUM[7] << 3;
 			PSUM_SHIFT[8]	<= PSUM[8];
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 2;
-			PSUM_SHIFT[10]	<= PSUM[10]	<< 4;
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 6;
-			PSUM_SHIFT[12]	<= PSUM[12]	<< 2;
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 4;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 6;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 8;
+			PSUM_SHIFT[9]	<= PSUM[9] << 1;
+			PSUM_SHIFT[10]	<= PSUM[10] << 2;
+			PSUM_SHIFT[11]	<= PSUM[11] << 3;
+			PSUM_SHIFT[12]	<= PSUM[12];
+			PSUM_SHIFT[13]	<= PSUM[13] << 1;
+			PSUM_SHIFT[14]	<= PSUM[14] << 2;
+			PSUM_SHIFT[15]	<= PSUM[15] << 3;
+		end
+		4'b01_10, 4'b10_01: begin
+			PSUM_SHIFT[0]	<= PSUM[0];
+			PSUM_SHIFT[1]	<= PSUM[1] << 1;
+			PSUM_SHIFT[2]	<= PSUM[2] << 2;
+			PSUM_SHIFT[3]	<= PSUM[3] << 3;
+			PSUM_SHIFT[4]	<= PSUM[4] << 1;
+			PSUM_SHIFT[5]	<= PSUM[5] << 2;
+			PSUM_SHIFT[6]	<= PSUM[6] << 3;
+			PSUM_SHIFT[7]	<= PSUM[7] << 4;
+			PSUM_SHIFT[8]	<= PSUM[8];
+			PSUM_SHIFT[9]	<= PSUM[9] << 1;
+			PSUM_SHIFT[10]	<= PSUM[10] << 2;
+			PSUM_SHIFT[11]	<= PSUM[11] << 3;
+			PSUM_SHIFT[12]	<= PSUM[12] << 1;
+			PSUM_SHIFT[13]	<= PSUM[13] << 2;
+			PSUM_SHIFT[14]	<= PSUM[14] << 3;
+			PSUM_SHIFT[15]	<= PSUM[15] << 4;
 		end
 		4'b10_10: begin
 			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1]	<< 2;
-			PSUM_SHIFT[2]	<= PSUM[2]	<< 4;
-			PSUM_SHIFT[3]	<= PSUM[3]	<< 6;
-			PSUM_SHIFT[4]	<= PSUM[4]	<< 2;
-			PSUM_SHIFT[5]	<= PSUM[5]	<< 4;
-			PSUM_SHIFT[6]	<= PSUM[6]	<< 6;
-			PSUM_SHIFT[7]	<= PSUM[7]	<< 8;
-			PSUM_SHIFT[8]	<= PSUM[8]	<< 4;
-			PSUM_SHIFT[9]	<= PSUM[9]	<< 6;
-			PSUM_SHIFT[10]	<= PSUM[10]	<< 8;
-			PSUM_SHIFT[11]	<= PSUM[11]	<< 10;
-			PSUM_SHIFT[12]	<= PSUM[12]	<< 6;
-			PSUM_SHIFT[13]	<= PSUM[13]	<< 8;
-			PSUM_SHIFT[14]	<= PSUM[14]	<< 10;
-			PSUM_SHIFT[15]	<= PSUM[15]	<< 12;
-		end
-		default: begin
-			PSUM_SHIFT[0]	<= PSUM[0];
-			PSUM_SHIFT[1]	<= PSUM[1];
-			PSUM_SHIFT[2]	<= PSUM[2];
-			PSUM_SHIFT[3]	<= PSUM[3];
-			PSUM_SHIFT[4]	<= PSUM[4];
-			PSUM_SHIFT[5]	<= PSUM[5];
-			PSUM_SHIFT[6]	<= PSUM[6];
-			PSUM_SHIFT[7]	<= PSUM[7];
-			PSUM_SHIFT[8]	<= PSUM[8];
-			PSUM_SHIFT[9]	<= PSUM[9];
-			PSUM_SHIFT[10]	<= PSUM[10];
-			PSUM_SHIFT[11]	<= PSUM[11];
-			PSUM_SHIFT[12]	<= PSUM[12];
-			PSUM_SHIFT[13]	<= PSUM[13];
-			PSUM_SHIFT[14]	<= PSUM[14];
-			PSUM_SHIFT[15]	<= PSUM[15];
+			PSUM_SHIFT[1]	<= PSUM[1] << 1;
+			PSUM_SHIFT[2]	<= PSUM[2] << 2;
+			PSUM_SHIFT[3]	<= PSUM[3] << 3;
+			PSUM_SHIFT[4]	<= PSUM[4] << 1;
+			PSUM_SHIFT[5]	<= PSUM[5] << 2;
+			PSUM_SHIFT[6]	<= PSUM[6] << 3;
+			PSUM_SHIFT[7]	<= PSUM[7] << 4;
+			PSUM_SHIFT[8]	<= PSUM[8] << 2;
+			PSUM_SHIFT[9]	<= PSUM[9] << 3;
+			PSUM_SHIFT[10]	<= PSUM[10] << 4;
+			PSUM_SHIFT[11]	<= PSUM[11] << 5;
+			PSUM_SHIFT[12]	<= PSUM[12] << 3;
+			PSUM_SHIFT[13]	<= PSUM[13] << 4;
+			PSUM_SHIFT[14]	<= PSUM[14] << 5;
+			PSUM_SHIFT[15]	<= PSUM[15] << 6;
 		end
 	endcase
 end
