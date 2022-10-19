@@ -1,0 +1,26 @@
+#-----------------------------------------------------------
+# Vivado v2020.2 (64-bit)
+# SW Build 3064766 on Wed Nov 18 09:12:47 MST 2020
+# IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
+# Start of session at: Wed Oct 19 14:53:54 2022
+# Process ID: 124806
+# Current directory: /home/intern2/hyesung/2022_GradPrj
+# Command line: vivado
+# Log file: /home/intern2/hyesung/2022_GradPrj/vivado.log
+# Journal file: /home/intern2/hyesung/2022_GradPrj/vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project /home/intern2/hyesung/works/BB_1b/BB_1b.xpr
+WARNING: [filemgmt 56-3] Default IP Output Path : Could not find the directory '/home/intern2/hyesung/works/BB_1b/BB_1b.gen/sources_1'.
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/opt/Xilinx/Vivado/2020.2/data/ip'.
+INFO: [IP_Flow 19-3899] Cannot get the environment domain name variable for the component vendor name. Setting the vendor name to 'user.org'.
+open_project: Time (s): cpu = 00:00:14 ; elapsed = 00:00:07 . Memory (MB): peak = 7416.172 ; gain = 55.355 ; free physical = 108616 ; free virtual = 223339
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 24
+[Wed Oct 19 15:10:14 2022] Launched synth_1...
+Run output will be captured here: /home/intern2/hyesung/works/BB_1b/BB_1b.runs/synth_1/runme.log

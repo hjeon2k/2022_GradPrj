@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module accumulator	( i_Sel_Bias_BUF, Bias_BUF, i_Flush, PSUM_Q, PSUM_SHIFT_MERGE, core_vld, PSUM_D );
 input	i_Sel_Bias_BUF;

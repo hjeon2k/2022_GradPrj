@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module result_quantized ( CLK, RST, core_Done, core_Psum, layer_num, next_i_precision, shift, o_Vld, o_Data);
 

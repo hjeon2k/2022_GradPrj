@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module core_top( CLK, RST, i_Act, i_Weight, i_Precision, w_Precision, i_Bias, i_Sel_Bias, i_Flush, layer_num, next_i_precision, next_i_precision_small, shift, core_vld, buf_base_addr, buf_base_addr_small, o_row, o_col, buf_ena_0, buf_addr_0, buf_wea_select_0, buf_wea_byte_0, buf_din_0, buf_ena_1, buf_addr_1, buf_wea_select_1, buf_wea_byte_1, buf_din_1, layer_done);
 

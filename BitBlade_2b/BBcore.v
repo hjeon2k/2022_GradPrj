@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module BBcore ( CLK, RST, i_Act, i_Weight, i_Precision, w_Precision, i_Bias, i_Sel_Bias, i_Flush, core_vld, o_Done, o_Psum );
 

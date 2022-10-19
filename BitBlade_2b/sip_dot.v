@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module	sip_dot	( i_Act, i_Weight, i_SignI, i_SignW, o_sip_dot );
 input	[`BITS_ACT-1:0]	i_Act;
