@@ -1,3 +1,4 @@
+/*
 module full_adder(
 input A,
 input B,
@@ -39,3 +40,4 @@ always @ (A, B) begin
 end
         
 endmodule
+*/

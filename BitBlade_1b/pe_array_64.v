@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module pe_array_64 ( CLK, RST, i_Act, i_Weight, i_Precision, i_Bias, i_Sel_Bias, i_Flush, core_vld, o_Done, o_Psum );
 input	CLK, RST;

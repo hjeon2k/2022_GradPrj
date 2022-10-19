@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module	sip_dot	( i_Act, i_Weight, i_SignI, i_SignW, o_sip_dot );
 input	[`BITS_ACT-1:0]	i_Act;
@@ -13,7 +13,7 @@ genvar i;
 generate
 	for (i=0;i<`N_DOT;i=i+1) begin: sip_dot_dot_forloop
 		//assign	o_sip_dot[i]	= i_Act[i] & i_Weight[i];
-		MUL_xnor_2_2 mul ( .A(i_Act[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .B(i_Weight[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .SignI(i_SignI), .SignW(i_SignW), .bin(bin), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
+		MUL_xnor_2_2 mul ( .I(i_Act[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .W(i_Weight[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .SignI(i_SignI), .SignW(i_SignW), .bin(bin), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
 	end
 endgenerate
 

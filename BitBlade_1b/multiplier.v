@@ -10,13 +10,14 @@ endmodule
 module MUL_xnor_2_2 (I, W, SignI, SignW, bin, MUL);
   input I, W;
   input SignI, SignW;
+  input bin;
   output [1:0] MUL;
 
   assign MUL = bin ? {0, ~(I^W)} : {I & W & SignI, I & W};
 
 endmodule
 
-
+/*
 module	MUL_reconfigurable_3_3 ( A, B, SignI, SignW, MUL );
 input	[1:0] 	A, B;
 input 	SignI, 	SignW;
@@ -52,4 +53,4 @@ full_adder 	FA_3 	( .A(PP[9]), 	.B(FA_1_CO),	.CI(FA_2_CO), 	.S(MUL[4]),	.CO(FA_3
 half_adder	HA_2	( .A(PP[10]),	.B(FA_3_CO), 	.S(MUL[5]), .CO(NOCONNECT));
 endmodule
 
-
+*/

@@ -8,15 +8,15 @@
 `define PE_ROW      16 //From 16 to 64
 `define PE_ARRAY    16
 
-`define N_ACT       N_DOT
-`define BITS_ACT	N_ACT*BITS_PARALLEL
-`define N_WEIGHT	N_DOT
-`define BITS_WEIGHT N_WEIGHT*BITS_PARALLEL
+`define N_ACT       `N_DOT
+`define BITS_ACT	`N_ACT*`BITS_PARALLEL
+`define N_WEIGHT	`N_DOT
+`define BITS_WEIGHT `N_WEIGHT*`BITS_PARALLEL
 `define N_BIAS      16 //Actually BITS_BIAS?
 
-`define MUX_FUS     PE_ROW*BITS_PARALLEL
+`define MUX_FUS     `PE_ROW*`BITS_PARALLEL
 `define BITS_MUL    2 //From 6 to 2
-`define BITS_DOT	N_DOT*BITS_MUL
+`define BITS_DOT	`N_DOT*`BITS_MUL
 `define BITS_SIP_DOT_ADDER  7 //BITS_MUL + log_2_N_DOT
 
 `define BITS_PSUM_SHIFT     13 //BITS_SIP_DOT_ADDER + MAX_SHIFT(6)

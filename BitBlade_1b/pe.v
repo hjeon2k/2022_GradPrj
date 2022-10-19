@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module pe	( CLK, Input_Feature, Weight, i_SignI, i_SignW, Output_PSUM );
 input	CLK;

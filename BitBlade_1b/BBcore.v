@@ -1,4 +1,4 @@
-`include "../source/parameters.v"
+`include "parameters.v"
 
 module BBcore ( CLK, RST, i_Act, i_Weight, i_Precision, w_Precision, i_Bias, i_Sel_Bias, i_Flush, core_vld, o_Done, o_Psum );
 
@@ -11,7 +11,7 @@ input	signed	[`N_BIAS*`PE_ARRAY-1:0]	i_Bias; // 16 bias
 input	i_Sel_Bias;
 input	i_Flush;
 input core_vld;
-output o_Done
+output o_Done;
 output [`BITS_PSUM*`PE_ARRAY-1:0] o_Psum;
 
 wire [`PE_ARRAY-1:0] o_Done_pe;

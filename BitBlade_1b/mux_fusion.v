@@ -1,5 +1,5 @@
-`include "../source/parameters.v"
-module mux_fusion_2b ( Precision, I, W, I_MUX, W_MUX );
+`include "parameters.v"
+module mux_fusion_1b ( Precision, I, W, I_MUX, W_MUX );
 input	[3:0]	Precision;
 input	[`MUX_FUS:0]	I, W;
 output	reg	[`MUX_FUS:0]	I_MUX, W_MUX;
