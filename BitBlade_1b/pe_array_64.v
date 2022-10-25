@@ -44,7 +44,8 @@ for (i=0;i<`PE_ROW;i=i+1) begin: transpose_forloop
 		assign	Act_TR[`BITS_PARALLEL*(i*`N_DOT+j) +: `BITS_PARALLEL]	= Act_MUX[`BITS_PARALLEL*(j*16+i) +: `BITS_PARALLEL];
 		assign	Weight_TR[`BITS_PARALLEL*(i*`N_DOT+j) +: `BITS_PARALLEL]	= Weight_MUX[`BITS_PARALLEL*(j*16+i) +: `BITS_PARALLEL];
 	end
-	pe	PE_MODULE	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_SignI(SignI[i]), .i_SignW(SignW[i]), .Output_PSUM(PSUM[i]) ); 
+	if (i%2==0) pe	PE_MODULE	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_SignI(SignI[i]), .i_SignW(SignW[i]), .Output_PSUM(PSUM[i]) ); 
+	else pe_	PE_MODULE_	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_SignI(SignI[i]), .i_SignW(SignW[i]), .Output_PSUM(PSUM[i]) ); 
 end
 endgenerate
 

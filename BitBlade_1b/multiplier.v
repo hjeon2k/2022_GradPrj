@@ -4,7 +4,12 @@ module MUL_and_2_2 (I, W, SignI, SignW, MUL);
   output [1:0] MUL;
 
   assign MUL = {I & W & SignI, I & W};
+endmodule
 
+module MUL_and_1_1 (I, W, MUL);
+  input I, W;
+  output MUL;
+  assign MUL = I & W;
 endmodule
 
 module MUL_xnor_2_2 (I, W, SignI, SignW, bin, MUL);
@@ -14,7 +19,6 @@ module MUL_xnor_2_2 (I, W, SignI, SignW, bin, MUL);
   output [1:0] MUL;
 
   assign MUL = bin ? {0, ~(I^W)} : {I & W & SignI, I & W};
-
 endmodule
 
 /*

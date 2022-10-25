@@ -6,16 +6,29 @@ input	[`BITS_WEIGHT-1:0]	i_Weight;
 input	i_SignI, i_SignW;
 output	[`BITS_DOT-1:0]	o_sip_dot;
 
+genvar i;
+generate
+	for (i=0;i<`N_DOT;i=i+1) begin: sip_dot_dot_forloop
+		MUL_and_2_2 mul ( .I(i_Act[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .W(i_Weight[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .SignI(i_SignI), .SignW(i_SignW), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
+	end
+endgenerate
+endmodule
+
+module	sip_dot_( i_Act, i_Weight, i_SignI, i_SignW, o_sip_dot );
+input	[`BITS_ACT-1:0]	i_Act;
+input	[`BITS_WEIGHT-1:0]	i_Weight;
+input	i_SignI, i_SignW;
+output	[`BITS_DOT-1:0]	o_sip_dot;
+
 wire bin; // xor
 assign bin = (~|i_SignI) | (~|i_SignW); // xor
 
 genvar i;
 generate
 	for (i=0;i<`N_DOT;i=i+1) begin: sip_dot_dot_forloop
-		MUL_xnor_2_2 mul ( .I(i_Act[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .W(i_Weight[`BITS_PARALLEL*i +: `BITS_PARALLEL]), .SignI(i_SignI), .SignW(i_SignW), .bin(bin), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
+		assign o_sip_dot[`BITS_MUL*i +: `BITS_MUL] = {0, i_Act[i] & i_Weight[i]};
 	end
 endgenerate
-
 endmodule
 
 module	sip_dot_adder ( i_sip_dot, o_sip_dot_adder );
@@ -36,10 +49,10 @@ endgenerate
 assign	o_sip_dot_adder	= sip_dotadd;
 
 assign sip_dotadd = 
-  i_sip_dot_vector[0] + i_sip_dot_vector[1] + i_sip_dot_vector[2] + i_sip_dot_vector[3] + i_sip_dot_vector[4] + i_sip_dot_vector[5] + i_sip_dot_vector[6] + i_sip_dot_vector[7]
-  + i_sip_dot_vector[8] + i_sip_dot_vector[9] + i_sip_dot_vector[10] + i_sip_dot_vector[11] + i_sip_dot_vector[12] + i_sip_dot_vector[13] + i_sip_dot_vector[14] + i_sip_dot_vector[15]
-  + i_sip_dot_vector[16] + i_sip_dot_vector[17] + i_sip_dot_vector[18] + i_sip_dot_vector[19] + i_sip_dot_vector[20] + i_sip_dot_vector[21] + i_sip_dot_vector[22] + i_sip_dot_vector[23]
-  + i_sip_dot_vector[24] + i_sip_dot_vector[25] + i_sip_dot_vector[26] + i_sip_dot_vector[27] + i_sip_dot_vector[28] + i_sip_dot_vector[29] + i_sip_dot_vector[30] + i_sip_dot_vector[31];
+  ((((i_sip_dot_vector[0] + i_sip_dot_vector[1]) + (i_sip_dot_vector[2] + i_sip_dot_vector[3])) + ((i_sip_dot_vector[4] + i_sip_dot_vector[5]) + (i_sip_dot_vector[6] + i_sip_dot_vector[7])))
+  + (((i_sip_dot_vector[8] + i_sip_dot_vector[9]) + (i_sip_dot_vector[10] + i_sip_dot_vector[11])) + ((i_sip_dot_vector[12] + i_sip_dot_vector[13]) + (i_sip_dot_vector[14] + i_sip_dot_vector[15]))))
+  + ((((i_sip_dot_vector[16] + i_sip_dot_vector[17]) + (i_sip_dot_vector[18] + i_sip_dot_vector[19])) + ((i_sip_dot_vector[20] + i_sip_dot_vector[21]) + (i_sip_dot_vector[22] + i_sip_dot_vector[23])))
+  + (((i_sip_dot_vector[24] + i_sip_dot_vector[25]) + (i_sip_dot_vector[26] + i_sip_dot_vector[27])) + ((i_sip_dot_vector[28] + i_sip_dot_vector[29]) + (i_sip_dot_vector[30] + i_sip_dot_vector[31]))));
   /*
   + i_sip_dot_vector[32] + i_sip_dot_vector[33] + i_sip_dot_vector[34] + i_sip_dot_vector[35] + i_sip_dot_vector[36] + i_sip_dot_vector[37] + i_sip_dot_vector[38] + i_sip_dot_vector[39]
   + i_sip_dot_vector[40] + i_sip_dot_vector[41] + i_sip_dot_vector[42] + i_sip_dot_vector[43] + i_sip_dot_vector[44] + i_sip_dot_vector[45] + i_sip_dot_vector[46] + i_sip_dot_vector[47]
