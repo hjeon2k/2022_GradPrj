@@ -1,29 +1,31 @@
 `include "parameters.v"
 
-module	sip_dot_2_2	( i_Act, i_Weight, i_SignI, o_sip_dot );
-parameter B = 2;
+module	sip_dot_xnor2 ( i_Act, i_Weight, i_SignI, bin, o_sip_dot );
+
 input	[`BITS_ACT-1:0]	i_Act;
 input	[`BITS_WEIGHT-1:0]	i_Weight;
-input	i_SignI;
+input	i_SignI, bin;
 output	[`BITS_DOT-1:0]	o_sip_dot;
 
 genvar i;
 generate
 	for (i=0;i<`N_DOT;i=i+1) begin: sip_dot_dot_forloop_2_2
-	   MUL_and_2_2 mul ( .I(i_Act[i]), .W(i_Weight[i]), .SignI(i_SignI), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
+	   MUL_xnor2 mul ( .I(i_Act[i]), .W(i_Weight[i]), .SignI(i_SignI), .bin(bin), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
 	end
 endgenerate
 endmodule
 
-module	sip_dot_1_1 ( i_Act, i_Weight, o_sip_dot );
+module	sip_dot_xnor1 ( i_Act, i_Weight, bin, o_sip_dot );
+
 input	[`BITS_ACT-1:0]	i_Act;
 input	[`BITS_WEIGHT-1:0]	i_Weight;
+input	bin;
 output	[`BITS_DOT-1:0]	o_sip_dot;
 
 genvar i;
 generate
-	for (i=0;i<`N_DOT;i=i+1) begin: sip_dot_dot_forloop_1_1
-		assign o_sip_dot[`BITS_MUL*i +: `BITS_MUL] = {0, i_Act[i] & i_Weight[i]};
+	for (i=0;i<`N_DOT;i=i+1) begin: sip_dot_dot_forloop_2_2
+	   MUL_xnor1 mul ( .I(i_Act[i]), .W(i_Weight[i]), .bin(bin), .MUL(o_sip_dot[`BITS_MUL*i +: `BITS_MUL]) );
 	end
 endgenerate
 endmodule
