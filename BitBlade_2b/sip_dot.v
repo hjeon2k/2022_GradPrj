@@ -34,5 +34,6 @@ endgenerate
 assign	o_sip_dot_adder	= sip_dotadd;
 
 assign sip_dotadd = i_sip_dot_vector[0] + i_sip_dot_vector[1] + i_sip_dot_vector[2] + i_sip_dot_vector[3] + i_sip_dot_vector[4] + i_sip_dot_vector[5] + i_sip_dot_vector[6] + i_sip_dot_vector[7];
+                    //+ i_sip_dot_vector[8] + i_sip_dot_vector[9] + i_sip_dot_vector[10] + i_sip_dot_vector[11] + i_sip_dot_vector[12] + i_sip_dot_vector[13] + i_sip_dot_vector[14] + i_sip_dot_vector[15];
 
 endmodule

@@ -6,7 +6,7 @@ output	reg	[WIDTH-1:0] 	Q;
 always @(posedge CLK)	Q <= D;
 
 endmodule
-
+/*
 module	DFFQF #(parameter WIDTH=32)( CLK, F, D, Q );
 input	CLK;
 input	F;
@@ -19,4 +19,4 @@ always @(posedge CLK) begin
 end
 
 endmodule
-
+*/
