@@ -29,7 +29,7 @@ wire	[`BITS_DOT-1:0]	Dot_Product;
 
 sip_dot_xnor1 sip_dot_xnor	( .i_Act(Input_Feature), .i_Weight(Weight), .bin(bin), .o_sip_dot(Dot_Product) );
 wire	signed	[`BITS_SIP_DOT_ADDER-1:0]	sip_dot_add;
-sip_dot_adder	sip_dot_adder	( .i_sip_dot(Dot_Product), .o_sip_dot_adder(sip_dot_add) );
+sip_dot_adder_1	sip_dot_adder	( .i_sip_dot(Dot_Product), .o_sip_dot_adder(sip_dot_add) );
 
 DFFQ	#(`BITS_SIP_DOT_ADDER)	DFFQ_SIP_DOT_ADD	( .CLK(CLK), .D(sip_dot_add), .Q(Output_PSUM) );
 //assign	Output_PSUM	= sip_dot_add;

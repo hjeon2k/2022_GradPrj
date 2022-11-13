@@ -1,9 +1,10 @@
 `include "parameters.v"
 
-module pe_array_64 ( CLK, RST, i_Act, i_Weight, i_Precision, i_Bias, i_Sel_Bias, i_Flush, core_vld, o_Done, o_Psum );
+module pe_array_64 ( CLK, RST, i_BF, i_Act, i_Weight, i_Precision, i_Bias, i_Sel_Bias, i_Flush, core_vld, o_Done, o_Psum );
 input	CLK, RST;
 input	[`BITS_ACT*`PE_ROW-1:0]	i_Act;
 input	[`BITS_WEIGHT*`PE_ROW-1:0]	i_Weight;
+input [1:0] i_BF;
 input	[3:0]	i_Precision;
 input	signed	[`N_BIAS-1:0]	i_Bias;
 input	i_Sel_Bias;
@@ -44,8 +45,8 @@ for (i=0;i<`PE_ROW;i=i+1) begin: transpose_forloop
 		assign	Act_TR[`BITS_PARALLEL*(i*`N_DOT+j) +: `BITS_PARALLEL]	= Act_MUX[`BITS_PARALLEL*(j*16+i) +: `BITS_PARALLEL];
 		assign	Weight_TR[`BITS_PARALLEL*(i*`N_DOT+j) +: `BITS_PARALLEL]	= Weight_MUX[`BITS_PARALLEL*(j*16+i) +: `BITS_PARALLEL];
 	end
-	if (i%2==0) pe_2_2	PE_MODULE_2	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_SignI(SignI[i/2]), .Output_PSUM(PSUM[i]) ); 
-	else pe_1_1	PE_MODULE_1	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .Output_PSUM(PSUM[i]) ); 
+	if (i%2==0) pe_2_2	PE_MODULE_2	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_BF(i_BF), .i_SignI(SignI[i/2]), .Output_PSUM(PSUM[i]) ); 
+	else pe_1_1	PE_MODULE_1	( .CLK(CLK), .Input_Feature(Act_TR[`BITS_ACT*i +: `BITS_ACT]), .Weight(Weight_TR[`BITS_WEIGHT*i +: `BITS_WEIGHT]), .i_BF(i_BF), .Output_PSUM(PSUM[i]) ); 
 end
 endgenerate
 
@@ -53,7 +54,6 @@ wire	signed	[`BITS_PSUM_SHIFT-1:0]	PSUM_SHIFT_MERGE;
 assign PSUM_SHIFT_MERGE = PSUM_SHIFT[0] + PSUM_SHIFT[1] + PSUM_SHIFT[2] + PSUM_SHIFT[3] + PSUM_SHIFT[4] + PSUM_SHIFT[5] + PSUM_SHIFT[6] + PSUM_SHIFT[7] + PSUM_SHIFT[8] + PSUM_SHIFT[9] + PSUM_SHIFT[10] + PSUM_SHIFT[11] + PSUM_SHIFT[12] + PSUM_SHIFT[13] + PSUM_SHIFT[14] + PSUM_SHIFT[15] ;
 
 wire	signed	[`BITS_PSUM-1:0]	PSUM_D, PSUM_Q;
-//assign	PSUM_D	= ( i_Sel_Bias_BUF ? Bias_BUF : PSUM_Q ) + PSUM_SHIFT_MERGE;
 accumulator	ACCU_PSUM	( .i_Sel_Bias_BUF(i_Sel_Bias_BUF), .Bias_BUF(Bias_BUF), .PSUM_Q(PSUM_Q), .i_Flush(i_Flush_BUF), .PSUM_SHIFT_MERGE(PSUM_SHIFT_MERGE), .core_vld(core_vld_BUF), .PSUM_D(PSUM_D) );
 DFFQ	#(`BITS_PSUM)	DFFQ_PSUM	( .CLK(CLK), .D(PSUM_D), .Q(PSUM_Q) );
 assign	o_Psum	= PSUM_Q;
